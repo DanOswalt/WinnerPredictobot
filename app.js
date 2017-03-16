@@ -1,10 +1,22 @@
 const prompt = require('prompt');
+const Player = require('./Player.js').player;
+const Team = require('./Team.js').team;
+
 
 console.reset = () => {
   return process.stdout.write('\033c');
 }
 
-const playMatch = (teamA, teamB) => {
+const playMatches = (matches) => {
+
+  for (let match = 1; match <= matches.length; match += 1) {
+    playMatch(matches[match].teamA, matches[match].teamB, match);
+  }
+
+  console.log(" ");
+}
+
+const playMatch = (teamA, teamB, match) => {
   const rounds = 21;
   const delay = 1000;
 
@@ -13,7 +25,7 @@ const playMatch = (teamA, teamB) => {
   }
 }
 
-const playRound = (teamA, teamB, round) => {
+const playRound = (teamA, teamB, round, match) => {
   const attackingTeam = randBetween(0,1) ? teamA : teamB;
   const defendingTeam = attackingTeam === teamA ? teamB : teamA;
   const attackingPlayer = attackingTeam.players[randBetween(0,2)];
@@ -34,7 +46,7 @@ const playRound = (teamA, teamB, round) => {
   }
 
   console.reset();
-  console.log(`${teamA.name} vs ${teamB.name}`);
+  console.log(`(${match}) ${teamA.name} vs ${teamB.name}`);
   console.log(`${round}. ${teamA.name} ${teamA.currentGoals} - ${teamB.name} ${teamB.currentGoals}`);
   console.log(` `);
   console.log(`${teamA.players[0].name} ${teamA.players[0].gameStats.goals}/${teamA.players[0].gameStats.misses} ${teamA.players[0].gameStats.blocks}/${teamA.players[0].gameStats.blocks}`);
@@ -49,87 +61,18 @@ const randBetween = (min, max) => {
     return Math.floor(Math.random()*(max-min+1)+min);
 }
 
+
+
+
+
 //run on open
 console.reset();
-
-const teamA = {
-  name : 'cats',
-  players :  [
-    {
-      name: 'meowzer',
-      attack: 45,
-      defense: 17,
-      gameStats: {
-        goals: 0,
-        misses: 0,
-        blocks: 0,
-        beats: 0
-      }
-    },
-    {
-      name: 'kitten',
-      attack: 34,
-      defense: 90,
-      gameStats: {
-        goals: 0,
-        misses: 0,
-        blocks: 0,
-        beats: 0
-      }
-    },
-    {
-      name: 'felini',
-      attack: 10,
-      defense: 12,
-      gameStats: {
-        goals: 0,
-        misses: 0,
-        blocks: 0,
-        beats: 0
-      }
-    }
-  ],
-  currentGoals : 0
-}
-
-const teamB = {
-  name : 'dogs',
-  players :  [
-    {
-      name: 'bowzer',
-      attack: 67,
-      defense: 34,
-      gameStats: {
-        goals: 0,
-        misses: 0,
-        blocks: 0,
-        beats: 0
-      }
-    },
-    {
-      name: 'spot',
-      attack: 23,
-      defense: 19,
-      gameStats: {
-        goals: 0,
-        misses: 0,
-        blocks: 0,
-        beats: 0
-      }
-    },
-    {
-      name: 'ide',
-      attack: 89,
-      defense: 56,
-      gameStats: {
-        goals: 0,
-        misses: 0,
-        blocks: 0,
-        beats: 0
-      }
-    }
-  ],
-  currentGoals : 0
-}
-
-playMatch(teamA, teamB);
+const teamA = new Team().init(1, 4, 7);
+const teamN = new Team().init(2, 5, 8);
+const matches = [
+  {
+    teamA: teamA,
+    teamB: teamB
+  }
+];
+playMatches(matches);
