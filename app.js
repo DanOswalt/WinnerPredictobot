@@ -20,7 +20,7 @@ const playMatch = (teamA, teamB, match) => {
   const delay = 1000;
 
   for (let round = 1; round <= rounds; round += 1) {
-    setTimeout(() => { playRound(teamA, teamB, round) }, delay * round);
+    setTimeout(() => { playRound(teamA, teamB, round, match) }, delay * round);
   }
 }
 
@@ -44,18 +44,23 @@ const playRound = (teamA, teamB, round, match) => {
     defendingPlayer.stats.game.blocks += 1;
   }
 
-  console.reset();
+  if (match === 0) {
+    console.reset();
+  }
 
-  //next thing TODO is to make a better dispaly method...
+  //next thing TODO is to make a better display method...
   console.log(`${teamA.name} vs ${teamB.name}`);
   console.log(`${round}. ${teamA.name} ${teamA.currentGoals} - ${teamB.name} ${teamB.currentGoals}`);
   console.log(` `);
   console.log(`${teamA.players[0].name} ${teamA.players[0].stats.game.goals}/${teamA.players[0].stats.game.misses} ${teamA.players[0].stats.game.blocks}/${teamA.players[0].stats.game.blocks}`);
   console.log(`${teamA.players[1].name} ${teamA.players[1].stats.game.goals}/${teamA.players[1].stats.game.misses} ${teamA.players[1].stats.game.blocks}/${teamA.players[1].stats.game.blocks}`);
   console.log(`${teamA.players[2].name} ${teamA.players[2].stats.game.goals}/${teamA.players[2].stats.game.misses} ${teamA.players[2].stats.game.blocks}/${teamA.players[2].stats.game.blocks}`);
+  console.log(' ');
   console.log(`${teamB.players[0].name} ${teamB.players[0].stats.game.goals}/${teamB.players[0].stats.game.misses} ${teamB.players[0].stats.game.blocks}/${teamB.players[0].stats.game.blocks}`);
   console.log(`${teamB.players[1].name} ${teamB.players[1].stats.game.goals}/${teamB.players[1].stats.game.misses} ${teamB.players[1].stats.game.blocks}/${teamB.players[1].stats.game.blocks}`);
   console.log(`${teamB.players[2].name} ${teamB.players[2].stats.game.goals}/${teamB.players[2].stats.game.misses} ${teamB.players[2].stats.game.blocks}/${teamB.players[2].stats.game.blocks}`);
+  console.log(' ');
+  console.log(' ');
 }
 
 
