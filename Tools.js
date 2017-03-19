@@ -46,7 +46,7 @@ class Tools {
            vowels[this.randNum(0,59)] +
            other_conson[this.randNum(0,59)] +
            vowels[this.randNum(0,59)];
-           
+
     word = this.capitalise(word);
     }
 
@@ -76,6 +76,27 @@ class Tools {
   static capitalise(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
+
+  static placeInto(template, stringToInsert, alignment) {
+    //to be used to pad a string with spaces or leading zeroes
+    //a la replaceOn('right', '-----', 'hi') => '---hi'
+
+    if (typeof template === 'string' &&
+        typeof stringToInsert === 'string' &&
+        template.length >= stringToInsert.length) {
+      if (alignment === 'left') {
+        return stringToInsert + template.substr(stringToInsert.length);
+      } else if (alignment === 'right') {
+        return String(template + stringToInsert).slice(-template.length);
+      } else {
+        console.log("sliceAndReplace: can't recognize '" + alignment + "' alignment." );
+        return "";
+      }
+    } else {
+      console.log('sliceAndReplace: something is wrong with string args.');
+      return "";
+    }
+  }
 }
 
 module.exports = Tools;

@@ -21,6 +21,10 @@ class Team {
       career : {
         wins: 0,
         losses: 0
+      },
+      trophies : {
+        tourneyChamp: 0,
+        seasonChamp: 0
       }
     }
     this.currentGoals = 0;

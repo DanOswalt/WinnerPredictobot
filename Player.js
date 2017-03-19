@@ -7,10 +7,10 @@ class Player {
     this.defense = 0;
     this.age = 0;
     this.peak_age = Tools.randNum(6, 15);
-    this.attack_roll_min = Tools.randNum(1, 15);
-    this.attack_roll_max = Tools.randNum(16, 30);
-    this.defense_roll_min = Tools.randNum(1, 15);
-    this.defense_roll_max = Tools.randNum(16, 30);
+    this.attack_roll_min = Tools.randNum(1, 20);
+    this.attack_roll_max = Tools.randNum(21, 40);
+    this.defense_roll_min = Tools.randNum(1, 20);
+    this.defense_roll_max = Tools.randNum(21, 40);
     this.stats = {
       game : {
         goals: 0,
@@ -29,7 +29,12 @@ class Player {
         misses: 0,
         blocks: 0,
         beats: 0
+      },
+      trophies : {
+        tourneyChamp: 0,
+        seasonChamp: 0
       }
+
     }
 
     for(let i = 0; i < start_age; i+=1) {
