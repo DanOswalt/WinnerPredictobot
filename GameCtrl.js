@@ -22,12 +22,16 @@ class GameCtrl {
   }
 
   static playRound(teamA, teamB, round, match) {
-    const attackingTeam = Tools.randNum(0,1) ? teamA : teamB;
+    const attackerIsTeamA = Tools.randNum(0,1);
+    const attackerIndex = Tools.randNum(0,2);
+    const defenderIndex = Tools.randNum(0,2);
+    const attackingTeam = attackerIsTeamA ? teamA : teamB;
     const defendingTeam = attackingTeam === teamA ? teamB : teamA;
-    const attackingPlayer = attackingTeam.players[Tools.randNum(0,2)];
-    const defendingPlayer = defendingTeam.players[Tools.randNum(0,2)];
+    const attackingPlayer = attackingTeam.players[attackerIndex];
+    const defendingPlayer = defendingTeam.players[defenderIndex];
     const attackRoll = Tools.randNum(1, attackingPlayer.attack); //+ bonus?
     const defenseRoll = Tools.randNum(1, defendingPlayer.defense); //+ bonus?
+    let goal = false;
 
     const winner = attackRoll > defenseRoll ? attackingPlayer : defendingPlayer;
 
@@ -36,15 +40,16 @@ class GameCtrl {
       attackingPlayer.stats.game.goals += 1;
       defendingPlayer.stats.game.beats += 1;
       attackingTeam.currentGoals += 1;
+      goal = true;
     } else {
       attackingPlayer.stats.game.misses += 1;
       defendingPlayer.stats.game.blocks += 1;
     }
 
-    this.displayGames(teamA, teamB, match);
+    this.displayGames(teamA, teamB, match, attackerIsTeamA, attackerIndex, defenderIndex, goal);
   }
 
-  static displayGames(teamA, teamB, match) {
+  static displayGames(teamA, teamB, match, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
     if (match === 0) {
       console.reset();
     };
@@ -57,9 +62,9 @@ class GameCtrl {
 
     //build player rows
     const playerRows = [];
-    const buffer = repeat(' ', 7);
 
     for (let i = 2; i >= 0; i -= 1) {
+      const actionsLine = this.buildActionLine(i, attackerIsTeamA, attackerIndex, defenderIndex, goal);
       const statsA = this.buildStatLine(teamA.players[i].stats.game);
       const statsB = this.buildStatLine(teamB.players[i].stats.game);
       const leftSideWithStats = Tools.placeInto(spacesTemplate, statsA, 'right');
@@ -68,7 +73,7 @@ class GameCtrl {
       const rightSideWithName = Tools.placeInto(spacesTemplate, teamB.players[i].name, 'right');
       const rightSide = Tools.placeInto(rightSideWithName, statsB, 'left');
 
-      playerRows.push(leftSide + buffer + rightSide);
+      playerRows.push(leftSide + actionsLine + rightSide);
     }
 
     console.log(` `);
@@ -78,7 +83,6 @@ class GameCtrl {
       console.log(row);
     })
     console.log(' ');
-    console.log('-----------------------------------------------------------');
   }
 
   static createTeams(numTeams) {
@@ -105,6 +109,33 @@ class GameCtrl {
     const blocks = Tools.placeInto(template, '' + gameStats.blocks, 'right');
     const beats = Tools.placeInto(template, '' + gameStats.beats, 'left');
     return `${goals}/${misses} ${blocks}/${beats}`;
+  }
+
+  static buildActionLine(i, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
+    const attackChar = goal ? 'o' : 'x';
+    const defenseChar = '|';
+    let teamAChar = ' ';
+    let teamBChar = ' ';
+
+    //left side
+    if (attackerIsTeamA && i === attackerIndex) {
+      teamAChar = attackChar;
+    };
+
+    if (!attackerIsTeamA && i === defenderIndex) {
+      teamAChar = defenseChar;
+    };
+
+    //right side
+    if (!attackerIsTeamA && i === attackerIndex) {
+      teamBChar = attackChar;
+    };
+
+    if (attackerIsTeamA && i === defenderIndex) {
+      teamBChar = defenseChar;
+    };
+
+    return ` ${teamAChar}   ${teamBChar} `;
   }
 
   static go() {
