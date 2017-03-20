@@ -13,7 +13,7 @@ class GameCtrl {
   }
 
   static playMatch(teamA, teamB, match) {
-    const rounds = 21;
+    const rounds = 15;
     const delay = 3000;
 
     for (let round = 1; round <= rounds; round += 1) {
@@ -46,13 +46,14 @@ class GameCtrl {
       defendingPlayer.stats.game.blocks += 1;
     }
 
-    this.displayGames(teamA, teamB, match, attackerIsTeamA, attackerIndex, defenderIndex, goal);
+    this.displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal);
   }
 
-  static displayGames(teamA, teamB, match, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
-    if (match === 0) {
+  static displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
+
+    if(match === 0) {
       console.reset();
-    };
+    }
 
     //build header
     const spacesTemplate = repeat(' ', 20);
@@ -76,6 +77,7 @@ class GameCtrl {
       playerRows.push(leftSide + actionsLine + rightSide);
     }
 
+
     console.log(` `);
     console.log(header);
     console.log(` `);
@@ -83,6 +85,7 @@ class GameCtrl {
       console.log(row);
     })
     console.log(' ');
+    this.displayCountdown(round);
   }
 
   static createTeams(numTeams) {
@@ -100,6 +103,13 @@ class GameCtrl {
         old += 1;
       }
     }
+  }
+
+  static displayCountdown(round) {
+    let template = repeat('|==', 15);
+    let bar = repeat('   ', round);
+    const countdown = Tools.placeInto(template, bar, 'left');
+    console.log(countdown);
   }
 
   static buildStatLine(gameStats) {
