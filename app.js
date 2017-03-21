@@ -7,5 +7,6 @@ console.reset = () => {
 }
 
 //run on open
+prompt.start();
 console.reset();
-GameCtrl.go();
+GameCtrl.startUp();

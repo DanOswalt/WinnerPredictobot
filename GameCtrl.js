@@ -6,6 +6,92 @@ const repeat = require('repeat-string');
 
 class GameCtrl {
 
+  static displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
+
+    if(match === 0) {
+      console.reset();
+    }
+
+    //build header
+    const spacesTemplate = repeat(' ', 20);
+    const teamAHeader = Tools.placeInto(spacesTemplate, teamA.name, 'right');
+    const teamBHeader = Tools.placeInto(spacesTemplate, teamB.name, 'left');
+    const header = `${teamAHeader} ${teamA.currentGoals} - ${teamB.currentGoals} ${teamBHeader}`;
+
+    //build player rows
+    const playerRows = [];
+
+    for (let i = 2; i >= 0; i -= 1) {
+      const actionsLine = this.buildActionLine(i, attackerIsTeamA, attackerIndex, defenderIndex, goal);
+      const statsA = this.buildStatLine(teamA.players[i].stats.game);
+      const statsB = this.buildStatLine(teamB.players[i].stats.game);
+      const leftSideWithStats = Tools.placeInto(spacesTemplate, statsA, 'right');
+      const leftSide = Tools.placeInto(leftSideWithStats, teamA.players[i].name, 'left');
+
+      const rightSideWithName = Tools.placeInto(spacesTemplate, teamB.players[i].name, 'right');
+      const rightSide = Tools.placeInto(rightSideWithName, statsB, 'left');
+
+      playerRows.push(leftSide + actionsLine + rightSide);
+    }
+
+
+    console.log(` `);
+    console.log(header);
+    console.log(` `);
+    playerRows.forEach(row => {
+      console.log(row);
+    })
+    console.log(' ');
+    this.displayCountdown(round);
+  }
+
+  static displayCountdown(round) {
+    let template = repeat('...', 15);
+    let bar = repeat('   ', round);
+    const countdown = Tools.placeInto(template, bar, 'left');
+    console.log(countdown);
+  }
+
+  static displayMainMenu() {
+    //display menu
+    //shows current season summary and options
+    //1. Play next match
+    //2. Show standings
+    //3. Show stats of all sorts
+
+    console.reset();
+    console.log('Current Season Top Standings');
+    console.log('1 Someone');
+    console.log('2 kLKhk');
+    console.log('3 aosdifuaopisduf');
+    console.log(' ');
+    console.log('Top Scorer');
+    console.log('Top Blocker');
+    console.log('Best Offense');
+    console.log('Best Defense');
+    console.log('Best Overall');
+    console.log(' ');
+    console.log('Week 19 of 20');
+    console.log('1. Play next match');
+    console.log('2. Start new');
+
+    prompt.get(['selection'], (err, result) => {
+      if (result.selection == 1) {
+        this.playNextMatch();
+      } else if (result.selection == 2) {
+        this.playNewSeason();
+      } else {
+        this.displayMainMenu();
+      }
+
+
+    })
+  }
+
+  static playNextMatch() {
+    console.log('okie dokie');
+  };
+
   static playMatches() {
     for (let i = 0; i < this.matches.length; i += 1) {
       this.playMatch(this.matches[i].teamA, this.matches[i].teamB, i);
@@ -49,45 +135,6 @@ class GameCtrl {
     this.displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal);
   }
 
-  static displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
-
-    if(match === 0) {
-      console.reset();
-    }
-
-    //build header
-    const spacesTemplate = repeat(' ', 20);
-    const teamAHeader = Tools.placeInto(spacesTemplate, teamA.name, 'right');
-    const teamBHeader = Tools.placeInto(spacesTemplate, teamB.name, 'left');
-    const header = `${teamAHeader} ${teamA.currentGoals} - ${teamB.currentGoals} ${teamBHeader}`;
-
-    //build player rows
-    const playerRows = [];
-
-    for (let i = 2; i >= 0; i -= 1) {
-      const actionsLine = this.buildActionLine(i, attackerIsTeamA, attackerIndex, defenderIndex, goal);
-      const statsA = this.buildStatLine(teamA.players[i].stats.game);
-      const statsB = this.buildStatLine(teamB.players[i].stats.game);
-      const leftSideWithStats = Tools.placeInto(spacesTemplate, statsA, 'right');
-      const leftSide = Tools.placeInto(leftSideWithStats, teamA.players[i].name, 'left');
-
-      const rightSideWithName = Tools.placeInto(spacesTemplate, teamB.players[i].name, 'right');
-      const rightSide = Tools.placeInto(rightSideWithName, statsB, 'left');
-
-      playerRows.push(leftSide + actionsLine + rightSide);
-    }
-
-
-    console.log(` `);
-    console.log(header);
-    console.log(` `);
-    playerRows.forEach(row => {
-      console.log(row);
-    })
-    console.log(' ');
-    this.displayCountdown(round);
-  }
-
   static createTeams(numTeams) {
     this.teams = [];
 
@@ -103,13 +150,6 @@ class GameCtrl {
         old += 1;
       }
     }
-  }
-
-  static displayCountdown(round) {
-    let template = repeat('|==', 15);
-    let bar = repeat('   ', round);
-    const countdown = Tools.placeInto(template, bar, 'left');
-    console.log(countdown);
   }
 
   static buildStatLine(gameStats) {
@@ -148,8 +188,10 @@ class GameCtrl {
     return ` ${teamAChar}   ${teamBChar} `;
   }
 
-  static go() {
-    this.createTeams(20);
+  static playNewSeason() {
+    //this is to be run only when starting for first-time
+    this.createTeams(16);
+
     this.setSchedule();
     this.playMatches();
   }
@@ -175,6 +217,11 @@ class GameCtrl {
         teamB : this.teams[7]
       }
     ]
+  }
+
+  static startUp(){
+    //this.fetchCurrentSeasonData(); async
+    this.displayMainMenu();
   }
 }
 
