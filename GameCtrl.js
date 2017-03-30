@@ -3,6 +3,8 @@ const Player = require('./Player.js');
 const Team = require('./Team.js');
 const Tools = require('./Tools.js');
 const repeat = require('repeat-string');
+const fs = require('fs');
+let data = require('./data.json');
 
 class GameCtrl {
 
@@ -150,6 +152,8 @@ class GameCtrl {
         old += 1;
       }
     }
+
+    this.save(this.teams);
   }
 
   static buildStatLine(gameStats) {
@@ -191,6 +195,9 @@ class GameCtrl {
   static playNewSeason() {
     //this is to be run only when starting for first-time
     this.createTeams(16);
+    data = {
+
+    }
 
     this.setSchedule();
     this.playMatches();
@@ -220,8 +227,11 @@ class GameCtrl {
   }
 
   static startUp(){
-    //this.fetchCurrentSeasonData(); async
     this.displayMainMenu();
+  }
+
+  static save(data) {
+    fs.writeFile('./data.json', JSON.stringify(data), "utf8");
   }
 }
 
