@@ -92,7 +92,7 @@ class GameCtrl {
     console.log('okie dokie');
   };
 
-  static playMatches() {
+  static playWeek() {
     for (let i = 0; i < data.matches.length; i += 1) {
       this.playMatch(data.matches[i].teamA, data.matches[i].teamB, i);
     }
@@ -103,8 +103,16 @@ class GameCtrl {
     const delay = 3000;
 
     for (let round = 1; round <= rounds; round += 1) {
-      setTimeout(() => { this.playRound(teamA, teamB, round, match) }, delay * round);
+      setTimeout(() => {
+        this.playRound(teamA, teamB, round, match)
+      }, delay * round);
     }
+
+    setTimeout(() => {
+      console.log(data);
+      //prompt to exit to main menu, maybe show a week summary
+      //on exit, increment week, check for season finish, save data
+    }, delay * rounds + 1);
   }
 
   static playRound(teamA, teamB, round, match) {
@@ -201,13 +209,13 @@ class GameCtrl {
     data.teams = this.createTeams(8);
     data.schedule = this.setSchedule(data.teams);
     this.save(data);
-    this.playMatches();
+    this.playWeek();
   }
 
   // static playNewSeason() {
   //   //
   //   this.setSchedule();
-  //   this.playMatches();
+  //   this.playWeek();
   // }
 
   static setSchedule() {
