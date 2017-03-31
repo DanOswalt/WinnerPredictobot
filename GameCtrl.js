@@ -81,12 +81,10 @@ class GameCtrl {
       if (result.selection == 1) {
         this.playNextMatch();
       } else if (result.selection == 2) {
-        this.playNewSeason();
+        this.startNewGame();
       } else {
         this.displayMainMenu();
       }
-
-
     })
   }
 
@@ -95,8 +93,8 @@ class GameCtrl {
   };
 
   static playMatches() {
-    for (let i = 0; i < this.matches.length; i += 1) {
-      this.playMatch(this.matches[i].teamA, this.matches[i].teamB, i);
+    for (let i = 0; i < data.matches.length; i += 1) {
+      this.playMatch(data.matches[i].teamA, data.matches[i].teamB, i);
     }
   }
 
@@ -138,10 +136,10 @@ class GameCtrl {
   }
 
   static createTeams(numTeams) {
-    this.teams = [];
+    const teams = [];
 
     for(let i = 0, young = 1, middle = 6, old = 11; i < numTeams; i += 1) {
-      this.teams.push(new Team(young, middle, old));
+      teams.push(new Team(young, middle, old));
       if (young === 5) {
         young = 1;
         middle = 6;
@@ -153,7 +151,7 @@ class GameCtrl {
       }
     }
 
-    this.save(this.teams);
+    return teams;
   }
 
   static buildStatLine(gameStats) {
@@ -192,36 +190,43 @@ class GameCtrl {
     return ` ${teamAChar}   ${teamBChar} `;
   }
 
-  static playNewSeason() {
-    //this is to be run only when starting for first-time
-    this.createTeams(16);
+  static startNewGame() {
     data = {
-
+      season: 1,
+      week: 1,
+      teams: [],
+      schedule: []
     }
 
-    this.setSchedule();
+    data.teams = this.createTeams(8);
+    data.schedule = this.setSchedule(data.teams);
+    this.save(data);
     this.playMatches();
   }
 
-  static setSchedule() {
-    this.matches = [];
+  // static playNewSeason() {
+  //   //
+  //   this.setSchedule();
+  //   this.playMatches();
+  // }
 
-    this.matches = [
+  static setSchedule() {
+    data.matches = [
       {
-        teamA : this.teams[0],
-        teamB : this.teams[1]
+        teamA : data.teams[0],
+        teamB : data.teams[1]
       },
       {
-        teamA : this.teams[2],
-        teamB : this.teams[3]
+        teamA : data.teams[2],
+        teamB : data.teams[3]
       },
       {
-        teamA : this.teams[4],
-        teamB : this.teams[5]
+        teamA : data.teams[4],
+        teamB : data.teams[5]
       },
       {
-        teamA : this.teams[6],
-        teamB : this.teams[7]
+        teamA : data.teams[6],
+        teamB : data.teams[7]
       }
     ]
   }
