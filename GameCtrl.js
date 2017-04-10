@@ -8,6 +8,57 @@ let data = require('./data.json');
 
 class GameCtrl {
 
+  //run
+  static startUp(){
+    if (data.length === 0) {
+      data = {
+        season: 1,
+        week: 0,
+        teams: [],
+        schedule: []
+      }
+    }
+    this.displayMainMenu();
+  }
+
+
+  //display info
+  static buildStatLine(gameStats) {
+    const template = '  ';
+    const goals = Tools.placeInto(template, '' + gameStats.goals, 'right');
+    const misses = Tools.placeInto(template, '' + gameStats.misses, 'left');
+    const blocks = Tools.placeInto(template, '' + gameStats.blocks, 'right');
+    const beats = Tools.placeInto(template, '' + gameStats.beats, 'left');
+    return `${goals}/${misses} ${blocks}/${beats}`;
+  }
+
+  static buildActionLine(i, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
+    const attackChar = goal ? 'o' : 'x';
+    const defenseChar = '|';
+    let teamAChar = ' ';
+    let teamBChar = ' ';
+
+    //left side
+    if (attackerIsTeamA && i === attackerIndex) {
+      teamAChar = attackChar;
+    };
+
+    if (!attackerIsTeamA && i === defenderIndex) {
+      teamAChar = defenseChar;
+    };
+
+    //right side
+    if (!attackerIsTeamA && i === attackerIndex) {
+      teamBChar = attackChar;
+    };
+
+    if (attackerIsTeamA && i === defenderIndex) {
+      teamBChar = defenseChar;
+    };
+
+    return ` ${teamAChar}   ${teamBChar} `;
+  }
+
   static displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
 
     if(match === 0) {
@@ -62,7 +113,8 @@ class GameCtrl {
     //3. Show stats of all sorts
 
     console.reset();
-    console.log('Current Season Top Standings');
+    //console.log(`As of week ${data.week} (of ${data.schedule.weeks.length}):`);
+    console.log('Leaderboard');
     console.log('1 Someone');
     console.log('2 kLKhk');
     console.log('3 aosdifuaopisduf');
@@ -73,13 +125,12 @@ class GameCtrl {
     console.log('Best Defense');
     console.log('Best Overall');
     console.log(' ');
-    console.log('Week 19 of 20');
     console.log('1. Play next match');
     console.log('2. Start new');
 
     prompt.get(['selection'], (err, result) => {
       if (result.selection == 1) {
-        this.playNextMatch();
+        this.playNextWeek();
       } else if (result.selection == 2) {
         this.startNewGame();
       } else {
@@ -88,12 +139,10 @@ class GameCtrl {
     })
   }
 
-  static playNextMatch() {
-    console.log('okie dokie');
-  };
 
+  //play
   static playWeek() {
-    for (let i = 0; i < data.matches.length; i += 1) {
+    for (let i = 0; i < data.schedule.weeks.length; i += 1) {
       this.playMatch(data.matches[i].teamA, data.matches[i].teamB, i);
     }
   }
@@ -143,11 +192,27 @@ class GameCtrl {
     this.displayGames(teamA, teamB, match, round, attackerIsTeamA, attackerIndex, defenderIndex, goal);
   }
 
+
+  //configure newness
+  static startNewGame() {
+    data = {
+      season: 1,
+      week: 0,
+      teams: [],
+      schedule: []
+    }
+
+    this.createTeams(8);
+    this.setSchedule(8);
+    this.save(data);
+    this.playWeek();
+  }
+
   static createTeams(numTeams) {
-    const teams = [];
+    data.teams = [];
 
     for(let i = 0, young = 1, middle = 6, old = 11; i < numTeams; i += 1) {
-      teams.push(new Team(young, middle, old));
+      data.teams.push(new Team(young, middle, old));
       if (young === 5) {
         young = 1;
         middle = 6;
@@ -158,94 +223,32 @@ class GameCtrl {
         old += 1;
       }
     }
-
-    return teams;
   }
 
-  static buildStatLine(gameStats) {
-    const template = '  ';
-    const goals = Tools.placeInto(template, '' + gameStats.goals, 'right');
-    const misses = Tools.placeInto(template, '' + gameStats.misses, 'left');
-    const blocks = Tools.placeInto(template, '' + gameStats.blocks, 'right');
-    const beats = Tools.placeInto(template, '' + gameStats.beats, 'left');
-    return `${goals}/${misses} ${blocks}/${beats}`;
-  }
+  static setSchedule(numWeeks) {
+    data.schedule.weeks = [];
+    const numMatches = data.teams.length / 2;
 
-  static buildActionLine(i, attackerIsTeamA, attackerIndex, defenderIndex, goal) {
-    const attackChar = goal ? 'o' : 'x';
-    const defenseChar = '|';
-    let teamAChar = ' ';
-    let teamBChar = ' ';
+    for (let week = 1; week <= numWeeks; week += 1) {
+      //each week, make a shallow copy of the teams and shuffle it
+      //pluck off the teams 2 at a time from shuffled teams array
 
-    //left side
-    if (attackerIsTeamA && i === attackerIndex) {
-      teamAChar = attackChar;
-    };
-
-    if (!attackerIsTeamA && i === defenderIndex) {
-      teamAChar = defenseChar;
-    };
-
-    //right side
-    if (!attackerIsTeamA && i === attackerIndex) {
-      teamBChar = attackChar;
-    };
-
-    if (attackerIsTeamA && i === defenderIndex) {
-      teamBChar = defenseChar;
-    };
-
-    return ` ${teamAChar}   ${teamBChar} `;
-  }
-
-  static startNewGame() {
-    data = {
-      season: 1,
-      week: 1,
-      teams: [],
-      schedule: []
-    }
-
-    data.teams = this.createTeams(8);
-    data.schedule = this.setSchedule(data.teams);
-    this.save(data);
-    this.playWeek();
-  }
-
-  // static playNewSeason() {
-  //   //
-  //   this.setSchedule();
-  //   this.playWeek();
-  // }
-
-  static setSchedule() {
-    data.matches = [
-      {
-        teamA : data.teams[0],
-        teamB : data.teams[1]
-      },
-      {
-        teamA : data.teams[2],
-        teamB : data.teams[3]
-      },
-      {
-        teamA : data.teams[4],
-        teamB : data.teams[5]
-      },
-      {
-        teamA : data.teams[6],
-        teamB : data.teams[7]
+      const teams = data.teams.slice();
+      Tools.shuffle(teams);
+      for (let match = 1; match <= numMatches; match += 1) {
+        data.schedule.weeks.push({
+          teamA: teams.pop(),
+          teamB: teams.pop()
+        });
       }
-    ]
+    }
   }
 
-  static startUp(){
-    this.displayMainMenu();
-  }
-
+  //data
   static save(data) {
     fs.writeFile('./data.json', JSON.stringify(data), "utf8");
   }
+
 }
 
 module.exports = GameCtrl;
