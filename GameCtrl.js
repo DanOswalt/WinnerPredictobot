@@ -113,7 +113,7 @@ class GameCtrl {
     //3. Show stats of all sorts
 
     console.reset();
-    //console.log(`As of week ${data.week} (of ${data.schedule.weeks.length}):`);
+    console.log(`As of week ${data.week}`);
     console.log('Leaderboard');
     console.log('1 Someone');
     console.log('2 kLKhk');
@@ -130,11 +130,11 @@ class GameCtrl {
 
     prompt.get(['selection'], (err, result) => {
       if (result.selection == 1) {
-        this.playNextWeek();
+        GameCtrl.playWeek();
       } else if (result.selection == 2) {
-        this.startNewGame();
+        GameCtrl.startNewGame();
       } else {
-        this.displayMainMenu();
+        GameCtrl.displayMainMenu();
       }
     })
   }
@@ -142,9 +142,14 @@ class GameCtrl {
 
   //play
   static playWeek() {
-    for (let i = 0; i < data.schedule.weeks.length; i += 1) {
-      this.playMatch(data.matches[i].teamA, data.matches[i].teamB, i);
+    data.week += 1;
+    const matches = data.schedule.weeks[data.week];
+
+    for (let i = 0; i < matches.length ; i += 1) {
+      //console.log('this', this);
+      GameCtrl.playMatch(matches[i].teamA, matches[i].teamB, i);
     }
+
   }
 
   static playMatch(teamA, teamB, match) {
@@ -158,9 +163,10 @@ class GameCtrl {
     }
 
     setTimeout(() => {
-      console.log(data);
+      // console.log(data);
       //prompt to exit to main menu, maybe show a week summary
       //on exit, increment week, check for season finish, save data
+      this.save(data, this.displayMainMenu);
     }, delay * rounds + 1);
   }
 
@@ -193,7 +199,7 @@ class GameCtrl {
   }
 
 
-  //configure newness
+  //configure brand new
   static startNewGame() {
     data = {
       season: 1,
@@ -204,8 +210,7 @@ class GameCtrl {
 
     this.createTeams(8);
     this.setSchedule(8);
-    this.save(data);
-    this.playWeek();
+    this.save(data, this.playWeek);
   }
 
   static createTeams(numTeams) {
@@ -229,24 +234,28 @@ class GameCtrl {
     data.schedule.weeks = [];
     const numMatches = data.teams.length / 2;
 
-    for (let week = 1; week <= numWeeks; week += 1) {
+    for (let i = 1; i <= numWeeks; i += 1) {
+      const week = [];
       //each week, make a shallow copy of the teams and shuffle it
       //pluck off the teams 2 at a time from shuffled teams array
 
       const teams = data.teams.slice();
       Tools.shuffle(teams);
-      for (let match = 1; match <= numMatches; match += 1) {
-        data.schedule.weeks.push({
+      for (let i = 1; i <= numMatches; i += 1) {
+        const match = {
           teamA: teams.pop(),
           teamB: teams.pop()
-        });
+        };
+        week.push(match);
       }
+
+      data.schedule.weeks.push(week)
     }
   }
 
   //data
-  static save(data) {
-    fs.writeFile('./data.json', JSON.stringify(data), "utf8");
+  static save(data, next) {
+    fs.writeFile('./data.json', JSON.stringify(data), "utf8", next);
   }
 
 }
